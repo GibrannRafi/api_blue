@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\UUID;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class Store extends Model
 {
-    use UUID;
+    use UUID, HasFactory;
     protected $fillable = [
         'user_id',
         'name',
@@ -20,20 +22,33 @@ class Store extends Model
         'is_verified',
     ];
 
+    protected $cast = [
+        'is_verified' => 'boolean',
+    ];
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' . $search . '%')
+            ->orWhere('phone', 'like', '%' . $search . '%');
+    }
+
     // relationships one store owned by one user
-    public function user (){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function storeBallance (){
+    public function storeBallance()
+    {
         return $this->hasOne(StoreBallance::class);
     }
 
-    public function products (){
+    public function products()
+    {
         return $this->hasMany(Product::class);
     }
 
-    public function transactions(){
+    public function transactions()
+    {
         return $this->hasMany(Transaction::class);
     }
 }
