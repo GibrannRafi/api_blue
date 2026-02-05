@@ -22,7 +22,7 @@ class Store extends Model
         'is_verified',
     ];
 
-    protected $cast = [
+    protected $casts = [
         'is_verified' => 'boolean',
     ];
     public function scopeSearch($query, $search)

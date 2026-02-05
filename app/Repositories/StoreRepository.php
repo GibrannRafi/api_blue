@@ -7,7 +7,8 @@ use App\Models\Store;
 use Illuminate\Support\Facades\DB;
 
 
-class StoreRepository implements StoreRepositoryInterface{
+class StoreRepository implements StoreRepositoryInterface
+{
     public function getAll(
         ?string $search,
         ?bool $isVerified,
@@ -24,11 +25,11 @@ class StoreRepository implements StoreRepositoryInterface{
             }
         });
 
-        if($limit){
+        if ($limit) {
             $query->take($limit);
         }
 
-        if($execute){
+        if ($execute) {
             return $query->get();
         }
 
@@ -41,10 +42,10 @@ class StoreRepository implements StoreRepositoryInterface{
         ?int $rowPerPage,
     ) {
         $query = $this->getAll(
-           $search,
-           $isVerified,
-           null,
-           false,
+            $search,
+            $isVerified,
+            null,
+            false,
         );
 
         return $query->paginate($rowPerPage);
@@ -60,8 +61,8 @@ class StoreRepository implements StoreRepositoryInterface{
     public function create(
         array $data,
     ) {
-       DB::beginTransaction(); // Data yang salah ga akan di simpan
-         try {
+        DB::beginTransaction(); // Data yang salah ga akan di simpan
+        try {
             $store = new Store;
             $store->user_id = $data['user_id'];
             $store->name = $data['name'];
@@ -76,15 +77,68 @@ class StoreRepository implements StoreRepositoryInterface{
 
             $store->storeBallance()->create([
                 'balance' => 0,
-            ]); 
+            ]);
             DB::commit();
             return $store;
-
         } catch (\Exception $e) {
             DB::rollBack(); // Kalau datanya ada kesalahan maka dia akan rollback
             throw new \Exception($e->getMessage());
         }
     }
 
-}
+    public function update(
+        string $id,
+        array $data,
+    ) {
+        DB::beginTransaction(); // Data yang salah ga akan di simpan
+        try {
+            $store = Store::find($id);
+            $store->name = $data['name'];
+            if (isset($data['logo'])) {
+                $store->logo = $data['logo']->store('assets/store', 'public');
+            }
+            $store->about = $data['about'];
+            $store->phone = $data['phone'];
+            $store->address_id = $data['address_id'];
+            $store->city = $data['city'];
+            $store->address = $data['address'];
+            $store->postal_code = $data['postal_code'];
+            $store->save();
+            DB::commit();
+            return $store;
+        } catch (\Exception $e) {
+            DB::rollBack(); // Kalau datanya ada kesalahan maka dia akan rollback
+            throw new \Exception($e->getMessage());
+        }
+    }
 
+    public function updateVerifiedStatus(string $id, bool $isVerified)
+    {
+        DB::beginTransaction();
+        try {
+            $store = Store::find($id);
+            $store->is_verified = $isVerified;
+            $store->save();
+            DB::commit();
+            return $store;;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception($e->getMessage());
+        }
+    }
+
+     public function delete(
+        string $id,
+    ) {
+        DB::beginTransaction();
+         try {
+            $store = Store::find($id);
+            $store->delete();
+            DB::commit();
+            return $store;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw new \Exception($e->getMessage());
+        }
+    }
+}

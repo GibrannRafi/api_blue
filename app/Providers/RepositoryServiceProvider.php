@@ -7,6 +7,8 @@ use App\Interfaces\UserRepositoryInterface;
 use App\Repositories\UserRepository;
 use App\Interfaces\StoreRepositoryInterface;
 use App\Repositories\StoreRepository;
+use App\Interfaces\StoreBallanceRepositoryInterface;
+use App\Repositories\StoreBallanceRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -22,6 +24,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(
             StoreRepositoryInterface::class,
             StoreRepository::class
+        );
+
+        $this->app->bind(
+            StoreBallanceRepositoryInterface::class,
+            StoreBallanceRepository::class
         );
     }
 

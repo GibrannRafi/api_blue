@@ -8,6 +8,7 @@ use App\Http\Resources\PaginateResource;
 use Illuminate\Http\Request;
 use App\Helper\ResponseHelper;
 use App\Http\Requests\StoreStoreRequest;
+use App\Http\Requests\StoreUpdateRequest;
 
 class StoreController extends Controller
 {
@@ -94,19 +95,74 @@ class StoreController extends Controller
         }
     }
 
+    public function updateVerifiedStatus(string $id){
+         try {
+            $store = $this->storeRepository->getById(
+                $id,
+            );
+
+            if (!$store) {
+                return ResponseHelper::jsonResponse(false, 'Data Toko tidak ditemukan', null, 404);
+            }
+
+            $this->storeRepository->updateVerifiedStatus(
+                $id,
+                true,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Data toko berhasil diverifikasi', new StoreResource($store), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
+    }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreUpdateRequest $request, string $id)
     {
-        //
+        $request = $request->validated();
+        try {
+            $store = $this->storeRepository->getById(
+                $id,
+            );
+
+            if (!$store) {
+                return ResponseHelper::jsonResponse(false, 'Data Toko tidak ditemukan', null, 404);
+            }
+
+            $store = $this->storeRepository->update(
+                $id,
+                $request,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Data toko berhasil diupdate', new StoreResource($store), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+     public function destroy(string $id)
     {
-        //
+       try {
+            $store = $this->storeRepository->getById(
+                $id,
+            );
+
+            if (!$store){
+                 return ResponseHelper::jsonResponse(false, 'Data toko tidak ditemukan', null, 404);
+            }
+
+            $store = $this->storeRepository->delete(
+                $id,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Data toko berhasil dihapus', new StoreResource($store), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 }
