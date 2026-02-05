@@ -18,6 +18,7 @@ class StoreBallanceFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => $this->faker->uuid(),
             'store_id' => Store::factory(),
             'balance' => $this->faker->randomFloat(2, 0, 1000000),
         ];
