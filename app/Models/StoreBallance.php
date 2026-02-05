@@ -28,8 +28,8 @@ class StoreBallance extends Model
     }
 
     // Store ballance is owned by one store
-    public function storeBallance ( ){
-        return $this->belongsTo(StoreBallance::class);
+    public function store(){
+        return $this->belongsTo(Store::class);
     }
 
     public function storeBalanceHistories(){

@@ -15,6 +15,7 @@ class StoreBallanceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+        'id' => $this->id,
         'store' => new StoreResource($this->store),
         'balance' => (float) (string) $this->balance
         ];
