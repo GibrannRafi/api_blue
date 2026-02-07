@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Store;
+use App\Models\StoreBallance;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Seeder;
@@ -15,13 +17,11 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = User::create([
-            'id' => (string) Str::uuid(),
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
-            'email_verified_at' => now(),
-            'password' => bcrypt('password'),
-        ]);
-        UserFactory::new()->count(15)->create();
+        // Ini akan membuat 10 Store, dan untuk setiap store dibuatkan 1 StoreBallance
+        Store::factory()->count(10)->create()->each(function ($store) {
+            StoreBallance::factory()->create([
+                'store_id' => $store->id, // Menggunakan ID store yang baru saja dibuat
+            ]);
+        });
     }
 }

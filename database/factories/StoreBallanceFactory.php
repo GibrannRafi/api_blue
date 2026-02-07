@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Store;
+use App\Models\StoreBallance;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class StoreBallanceFactory extends Factory
 {
+    protected $model = StoreBallance::class;
     /**
      * Define the model's default state.
      *
@@ -18,7 +20,6 @@ class StoreBallanceFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
             'store_id' => Store::factory(),
             'balance' => $this->faker->randomFloat(2, 0, 1000000),
         ];
