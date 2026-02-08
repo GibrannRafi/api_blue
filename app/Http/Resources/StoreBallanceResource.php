@@ -15,9 +15,10 @@ class StoreBallanceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-        'id' => $this->id,
+            'id' => $this->id,
         'store' => new StoreResource($this->store),
-        'balance' => (float) (string) $this->balance
+        'balance' => (float) (string) $this->balance,
+        'store_ballance_histories' => StoreBallanceHistoryResource::collection($this->whenLoaded('storeBallanceHistories')),
         ];
     }
 }

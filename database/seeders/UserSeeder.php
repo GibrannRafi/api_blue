@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
         // Ini akan membuat 10 Store, dan untuk setiap store dibuatkan 1 StoreBallance
         Store::factory()->count(10)->create()->each(function ($store) {
             StoreBallance::factory()->create([
-                'store_id' => $store->id, // Menggunakan ID store yang baru saja dibuat
+                'store_id' => $store->id,
             ]);
         });
     }

@@ -72,7 +72,7 @@ class UserRepository implements UserRepositoryInterface
         }
     }
 
-     public function create(
+    public function create(
         array $data,
     ) {
        DB::beginTransaction(); // Data yang salah ga akan di simpan

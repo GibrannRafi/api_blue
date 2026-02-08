@@ -2,7 +2,7 @@
 
 namespace App\Interfaces;
 
-interface StoreBallanceRepositoryInterface{
+interface StoreBallanceHistoryRepositoryInterface{
     public function getAll(
         ?string $search,
 
@@ -12,21 +12,19 @@ interface StoreBallanceRepositoryInterface{
 
     public function getAllPaginated(
         ?string $search,
-
         ?int $rowPerPage,
     );
 
-     public function getById(
+    public function getById(
         string $id,
     );
 
-    public function credit(
-        string $id,
-        string $amount,
+    public function create(
+        array $data,
     );
 
-    public function debit(
+    public function update(
         string $id,
-        string $amount,
+        array $data,
     );
 }

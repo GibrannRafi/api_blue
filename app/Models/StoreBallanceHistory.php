@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\UUID;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class StoreBallanceHistory extends Model
 {
-    use UUID;
+    use UUID, HasFactory;
 
     protected $fillable = [
         'store_ballance_id',
@@ -17,8 +19,12 @@ class StoreBallanceHistory extends Model
         'remarks',
     ];
 
+    protected $casts = [
+        'amount' => 'decimal:2',
+    ];
+
     // Store ballance history belongs to one store
-    public function store(){
+    public function storeBallance(){
         return $this->belongsTo(StoreBallance::class);
     }
 }

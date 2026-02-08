@@ -2,7 +2,9 @@
 
 namespace App\Interfaces;
 
-interface StoreBallanceRepositoryInterface{
+use Illuminate\Http\UploadedFile;
+
+interface WithdrawalRepositoryInterface{
     public function getAll(
         ?string $search,
 
@@ -12,21 +14,20 @@ interface StoreBallanceRepositoryInterface{
 
     public function getAllPaginated(
         ?string $search,
-
         ?int $rowPerPage,
     );
 
-     public function getById(
+    public function getById(
         string $id,
     );
 
-    public function credit(
-        string $id,
-        string $amount,
+    public function create(
+        array $data,
     );
 
-    public function debit(
+    public function approve(
         string $id,
-        string $amount,
+        UploadedFile $proof
     );
+
 }

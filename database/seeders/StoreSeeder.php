@@ -6,6 +6,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Store;
 use App\Models\StoreBallance;
+use App\Models\StoreBallanceHistory;
+use App\Models\Withdrawal;
 
 class StoreSeeder extends Seeder
 {
@@ -15,9 +17,16 @@ class StoreSeeder extends Seeder
     public function run(): void
     {
         Store::factory()->count(10)->create()->each(function ($store){
-            StoreBallance::factory()->create([
+           $storeBallance =  StoreBallance::factory()->create([
                 'store_id' => $store->id,
-            ]); 
+            ]);
+            StoreBallanceHistory::factory()->create([
+                'store_ballance_id' => $storeBallance->id,
+                'amount' => $storeBallance->balance,
+            ]);
+            Withdrawal::factory()->count(1)->create([
+                'store_ballance_id' => $storeBallance->id,
+            ]);
         });
     }
 }

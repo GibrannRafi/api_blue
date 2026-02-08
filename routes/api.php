@@ -1,18 +1,29 @@
 <?php
 
 use App\Http\Controllers\StoreBallanceController;
+use App\Http\Controllers\StoreBallanceHistoryController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\WithdrawalController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource('user', UserController::class);
 Route::get('user/all/paginated',[UserController::class, 'getAllPaginated']);
-Route::post('store/{id}/verified', [StoreController::class, 'updateVerifiedStatus']);
 
+
+Route::post('store/{id}/verified', [StoreController::class, 'updateVerifiedStatus']);
 Route::apiResource('store', StoreController::class);
 Route::get('store/all/paginated',[StoreController::class, 'getAllPaginated']);
 
-Route::apiResource('store-ballance', StoreBallanceController::class);
+Route::apiResource('store-ballance', StoreBallanceController::class)->except(['store', 'update', 'delete']);
 Route::get('store-ballance/all/paginated',[StoreBallanceController::class, 'getAllPaginated']);
+
+
+Route::apiResource('store-ballance-history', StoreBallanceHistoryController::class)->except(['store','update', 'delete']);
+Route::get('store-ballance-history/all/paginated',[StoreBallanceHistoryController::class, 'getAllPaginated']);
+
+Route::apiResource('withdrawal', WithdrawalController::class)->except(['update', 'delete']);
+Route::get('withdrawal/all/paginated',[WithdrawalController::class, 'getAllPaginated']);
+Route::post('withdrawal/{id}/approve', [WithdrawalController::class, 'approve']);

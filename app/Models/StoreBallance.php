@@ -32,7 +32,7 @@ class StoreBallance extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function storeBalanceHistories(){
+    public function storeBallanceHistories(){
         return $this->hasMany(StoreBallanceHistory::class);
     }
 
