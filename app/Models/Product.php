@@ -19,9 +19,15 @@ class Product extends Model
         'image',
     ];
 
-    protected $cast = [
+    protected $casts = [
         'price' => 'decimal:2'
     ];
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'like', '%' .$search . '%')
+            ->orWhere('email', 'like', '%' .$search . '%');
+    }
 
     public function store(){
         return $this->belongsTo(Store::class);
