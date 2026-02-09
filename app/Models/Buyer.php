@@ -19,8 +19,12 @@ class Buyer extends Model
 
     public function scopeSearch($query, $search)
     {
-        return $query->where('user', 'like', '%' . $search . '%')
-            ->orWhere('phone', 'like', '%' . $search . '%');
+       return $query->where(function($q) use ($search) {
+        $q->where('user_id', 'like', '%' . $search . '%')
+          ->orWhereHas('user', function($userQuery) use ($search) {
+              $userQuery->where('name', 'like', '%' . $search . '%');
+          });
+    });
     }
 
     // Buyer is associated with one user

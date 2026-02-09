@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helper\ResponseHelper;
+use App\Http\Requests\BuyerRequest;
+use App\Http\Requests\BuyerUpdateRequest;
 use App\Http\Resources\BuyerResource;
 use App\Http\Resources\PaginateResource;
 use App\Interfaces\BuyerRepositoryInterface;
@@ -56,9 +58,18 @@ class BuyerController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BuyerRequest $request)
     {
-        //
+         $request = $request->validated();
+
+        try {
+            $buyers = $this->buyerRepository->create($request);
+            return ResponseHelper::jsonResponse(true, 'Data Pembeli berhasil ditambahkan', new BuyerResource($buyers), 201);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+
+        }
+
     }
 
     /**
@@ -66,15 +77,43 @@ class BuyerController extends Controller
      */
     public function show(string $id)
     {
-        //
+        try {
+            $buyers = $this->buyerRepository->getById(
+                $id,
+            );
+
+            if (!$buyers){
+                 return ResponseHelper::jsonResponse(false, 'Data buyer tidak ditemukan', null, 404);
+            }
+
+            return ResponseHelper::jsonResponse(true, 'Data buyer berhasil diambil', new BuyerResource($buyers), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(BuyerUpdateRequest $request, string $id)
     {
-        //
+        $request = $request->validated();
+
+         try {
+            $buyers = $this->buyerRepository->getById(
+                $id,
+            );
+
+            if (!$buyers){
+                 return ResponseHelper::jsonResponse(false, 'Data buyer tidak ditemukan', null, 404);
+            }
+
+            $buyers = $this->buyerRepository->update($id,$request);
+
+            return ResponseHelper::jsonResponse(true, 'Data Pembeli berhasil Diupdate', new BuyerResource($buyers), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 
     /**
@@ -82,6 +121,23 @@ class BuyerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+    try {
+            $buyer = $this->buyerRepository->getById(
+                $id,
+            );
+
+            if (!$buyer){
+                 return ResponseHelper::jsonResponse(false, 'Data BUyer tidak ditemukan', null, 404);
+            }
+
+            $buyer = $this->buyerRepository->delete(
+                $id,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Data Buyer berhasil dihapus', new BuyerResource($buyer), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 }
+
