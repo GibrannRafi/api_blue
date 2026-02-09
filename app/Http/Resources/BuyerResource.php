@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StoreBallanceResource extends JsonResource
+class BuyerResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,10 +15,11 @@ class StoreBallanceResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-        'id' => $this->id,
-        'store' => new StoreResource($this->store),
-        'balance' => (float) (string) $this->balance,
-        'store_ballance_histories' => StoreBallanceHistoryResource::collection($this->whenLoaded('storeBallanceHistories')),
+            'id' => $this->id,
+            'user_id' => new UserResource($this->user),
+            'profile_picture' => asset('storage/'. $this->profile_picture),
+            'phone_number' => $this->phone_number
+
         ];
     }
 }
