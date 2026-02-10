@@ -19,7 +19,8 @@ return new class extends Migration
             $table->foreign('product_category_id')->references('id')->on('product_categories')->onDelete('cascade');
             $table->string('name');
             $table->string('slug')->unique();
-            $table->enum('condition', ['new', 'used']);
+            $table->longText('description');
+            $table->enum('condition', ['new', 'second']);
             $table->decimal('price', 26, 2);
             $table->integer('weight');
             $table->integer('stock');
