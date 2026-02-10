@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helper\ResponseHelper;
 use App\Http\Requests\ProductCategoryStoreRequest;
+use App\Http\Requests\ProductCategoryUpdateRequest;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\ProductCategoryResource;
 use App\Interfaces\ProductCategoryRepositoryInterface;
@@ -111,9 +112,26 @@ class ProductCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductCategoryUpdateRequest $request, string $id)
     {
-        //
+        $request = $request->validated();
+        try {
+            $productCategory = $this->productCategoryRepository->getById(
+                $id,
+            );
+
+            if (!$productCategory) {
+                return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
+            }
+
+            $productCategory = $this->productCategoryRepository->update($id,$request);
+
+
+
+            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diupdate', new ProductCategoryResource($productCategory), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 
     /**

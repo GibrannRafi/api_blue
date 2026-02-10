@@ -96,4 +96,35 @@ class ProductCategoryRepository implements ProductCategoryRepositoryInterface
             throw new Exception($e->getMessage());
         }
     }
+
+    public function update(
+        string $id,
+        array $data
+    ) {
+        DB::beginTransaction();
+        try {
+            $productCategory = ProductCategory::find($id);
+
+            if (isset($data['parent_id'])) {
+                $productCategory->parent_id = $data['parent_id'];
+            }
+            if (isset($data['image'])) {
+                $productCategory->image = $data['image']->store('assets/product-category', 'public');
+            }
+            $productCategory->name = $data['name'];
+            $productCategory->slug = Str::slug($data['name']);
+
+            if (isset($data['tagline'])) {
+                $productCategory->tagline = $data['tagline'];
+            }
+            $productCategory->description = $data['description'];
+            $productCategory->save();
+            DB::commit();
+            return $productCategory;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            throw new Exception($e->getMessage());
+        }
+    }
 }

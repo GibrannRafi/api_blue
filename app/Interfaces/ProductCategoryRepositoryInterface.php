@@ -28,4 +28,9 @@ interface ProductCategoryRepositoryInterface{
         array $data,
     );
 
+    public function update(
+        string $id,
+        array $data,
+    );
+
 }
