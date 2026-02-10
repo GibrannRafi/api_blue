@@ -9,19 +9,19 @@ class ProductRepository implements ProductRepositoryInterface
 {
     public function getAll(
         ?string $search,
-        ?string $productCategoryId = null,
+        ?string $productCategory = null,
         ?int $limit,
         bool $execute,
     ) {
-        $query = Product::where(function ($query) use ($productCategoryId, $search) {
+        $query = Product::where(function ($query) use ($productCategory, $search) {
             if ($search) {
                 $query->search($search);
             }
 
-            if ($productCategoryId === true) {
-                $query->where('product_category_id', $productCategoryId);
+            if ($productCategory === true) {
+                $query->where('product_category_id', $productCategory);
             }
-        });
+        })->with('productImages');
 
         if ($limit) {
             $query->take($limit);
@@ -36,16 +36,32 @@ class ProductRepository implements ProductRepositoryInterface
 
     public function getAllPaginated(
         ?string $search,
-        ?string $productCategoryId = null,
+        ?string $productCategory = null,
         ?int $rowPerPage,
     ) {
         $query = $this->getAll(
             $search,
-            $productCategoryId,
+            $productCategory,
             null,
             false,
         );
 
         return $query->paginate($rowPerPage);
     }
+
+     public function getById(
+        string $id,
+    ) {
+        $query = Product::where('id', $id)->with('productImages');
+
+        return $query->first();
+    }
+
+    public function getBySlug(
+        string $slug,
+    ) {
+        $query = Product::where('slug', $slug)->with('productImages');
+        return $query->first();
+    }
+
 }

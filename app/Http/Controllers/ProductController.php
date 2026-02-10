@@ -50,7 +50,7 @@ class ProductController extends Controller
                 $request['row_per_page'],
             );
 
-            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diambil', PaginateResource::make($products, ProductResource::class), 200);
+            return ResponseHelper::jsonResponse(true, 'Data  produk berhasil diambil', PaginateResource::make($products, ProductResource::class), 200);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
         }
@@ -69,8 +69,38 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        //
+       try {
+            $product = $this->productRepository->getById(
+                $id,
+            );
+
+            if (!$product) {
+                return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
+            }
+
+            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diambil', new ProductResource($product), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
+
+     public function showBySlug(string $slug)
+    {
+        try {
+            $product = $this->productRepository->getBySlug(
+                $slug,
+            );
+
+            if (!$product) {
+                return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
+            }
+
+            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diambil', new ProductResource($product), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
+    }
+
 
     /**
      * Update the specified resource in storage.
