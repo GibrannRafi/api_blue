@@ -14,19 +14,20 @@ class Product extends Model
         'name',
         'slug',
         'description',
+        'condition',
         'price',
+        'weight',
         'stock',
-        'image',
     ];
 
     protected $casts = [
         'price' => 'decimal:2'
     ];
 
-    public function scopeSearch($query, $search)
+     public function scopeSearch($query, $search)
     {
-        return $query->where('name', 'like', '%' .$search . '%')
-            ->orWhere('email', 'like', '%' .$search . '%');
+        return $query->where('name', 'like', '%' .$search . '%');
+
     }
 
     public function store(){
