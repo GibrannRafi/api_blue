@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helper\ResponseHelper;
+use App\Http\Requests\ProductCategoryStoreRequest;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\ProductCategoryResource;
 use App\Interfaces\ProductCategoryRepositoryInterface;
@@ -58,23 +59,30 @@ class ProductCategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductCategoryStoreRequest $request)
     {
-        //
-    }
+        $request = $request->validated();
 
+        try {
+            $productCategory = $this->productCategoryRepository->create($request);
+
+            return ResponseHelper::jsonResponse(true, 'Kategori Produk Berhasil Dibuat ', new ProductCategoryResource($productCategory), 201);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
+    }
     /**
      * Display the specified resource.
      */
     public function show(string $id)
     {
-          try {
+        try {
             $productCategory = $this->productCategoryRepository->getById(
                 $id,
             );
 
-            if (!$productCategory){
-                 return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
+            if (!$productCategory) {
+                return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
             }
 
             return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diambil', new ProductCategoryResource($productCategory), 200);
@@ -85,13 +93,13 @@ class ProductCategoryController extends Controller
 
     public function showBySlug(string $slug)
     {
-          try {
+        try {
             $productCategory = $this->productCategoryRepository->getBySlug(
                 $slug,
             );
 
-            if (!$productCategory){
-                 return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
+            if (!$productCategory) {
+                return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
             }
 
             return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diambil', new ProductCategoryResource($productCategory), 200);
