@@ -36,3 +36,4 @@ Route::get('buyer/all/paginated',[BuyerController::class, 'getAllPaginated']);
 
 Route::apiResource( 'product-category', ProductCategoryController::class);
 Route::get('product-category/all/paginated',[ProductCategoryController::class, 'getAllPaginated']);
+Route::get('product-category/slug/{slug}', [ProductCategoryController::class, 'showBySlug']);
