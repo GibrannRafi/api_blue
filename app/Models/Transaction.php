@@ -31,6 +31,10 @@ class Transaction extends Model
         'grand_total' => 'decimal:2',
     ];
 
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('code', 'like', '%' .$search . '%');
+    }
     public function buyer (){
         return $this->belongsTo(Buyer::class);
     }
