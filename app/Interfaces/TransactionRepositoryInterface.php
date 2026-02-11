@@ -22,5 +22,9 @@ interface TransactionRepositoryInterface {
         string $code,
     );
 
+    public function create(
+        array $data
+    );
+
 
 }

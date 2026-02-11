@@ -3,7 +3,12 @@
 namespace App\Repositories;
 
 use App\Interfaces\TransactionRepositoryInterface;
+use App\Models\Product;
+use App\Models\Store;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+
 
 class TransactionRepository implements TransactionRepositoryInterface {
 
@@ -56,4 +61,126 @@ public function getAll(
         return $query->first();
     }
 
+
+    public function create(
+        array $data
+    ){
+
+    DB::beginTransaction();
+    try {
+        $transaction = new Transaction;
+        $transaction->code = 'BLUE' . str_pad(mt_rand(1,99999),5,'0',STR_PAD_LEFT);
+        $transaction->buyer_id = $data['buyer_id'];
+        $transaction->store_id = $data['store_id'];
+        $transaction->address_id = $data['address_id'];
+        $transaction->address = $data['address'];
+        $transaction->city = $data['city'];
+        $transaction->postal_code = $data['postal_code'];
+        $transaction->shipping = $data['shipping'];
+        $transaction->shipping_type = $data['shipping_type'];
+        $transaction->shipping_cost = 0;
+        $transaction->tax = 0;
+        $transaction->grand_total = 0;
+        $transaction->save();
+
+        $transactionDetailRepository = new TransactionDetailRepository;
+
+        $transactionDetails = [];
+
+        foreach ($data['products'] as $transactionDetail){
+             $transactionDetail = $transactionDetailRepository->create([
+                'transaction_id' => $transaction->id,
+                'product_id' => $transactionDetail['product_id'],
+                'qty' => $transactionDetail['qty']
+             ]);
+
+             $transactionDetail[] = $transactionDetail;
+        }
+
+        $subtotal = array_reduce($transactionDetails, function ($carry, $item){
+            return $carry + $item->subtotal;
+        }, 0);
+
+        $weight = $this->getTotalWeight($transactionDetails);
+        $calculation = $this->calculateShippingAndTax($data, $subtotal,$weight);
+
+        DB::commit();
+
+        \Midtrans\Config::$serverKey= config('midtrans.serverKey');
+        \Midtrans\Config::$isProduction= config('midtrans.isProduction');
+        \Midtrans\Config::$isSanitized= config('midtrans.isSanitized');
+        \Midtrans\Config::$is3ds= config('midtrans.is3ds');
+
+
+        $params = array (
+            'transaction_details' => array (
+                'order_id' =>$transaction->code,
+                'gross_amount' => $transaction->grand_total
+            ),
+            'customer_details' => array (
+                'first_name' => $transaction->buyer->name,
+                'email' => $transaction->buyer->email
+            ),
+        );
+
+        $snapToken = \Midtrans\Snap::getSnapToken($params);
+
+        $transaction->snap_token = $snapToken;
+        return $transaction;
+    } catch (\Throwable $th) {
+        //throw $th;
+    }
+
+    }
+
+    private function getTotalWeight(array $transactionDetails){
+        $productIds = collect($transactionDetails)->pluck('product_id')->toArray();
+        $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+        $totalWeight = 0;
+
+        foreach($transactionDetails as $item){
+            $product = $products[$item['product_id']] ?? null;
+
+            if($product){
+                $totalWeight += $product->weight * $item['qty'];
+            }
+
+        }
+        return $totalWeight;
+    }
+
+  private function calculateShippingAndTax(array $data, float $subtotal, int $weight) {
+    $origin = Store::find($data['store_id'])->address_id;
+
+    $destination = $data['address_id'];
+
+    $response = Http::withHeaders([
+        'key' => '2bLz5yZc9ba8376110299a4eXwTWYfiP',
+    ])->asForm()->post('https://rajaongkir.komerce.id/api/v1/calculate/domestic-cost', [
+        'origin' => $origin,
+        'destination' => $destination,
+        'weight' => $weight,
+        'courier' => 'jne:sicepat:ide:sap:jnt:ninja:tiki:lion:anteraja:pos:ncs:rex:rpx:sentral:star:wahana:dse',
+        'price' => 'lowest'
+    ]);
+    /** @var \Illuminate\Http\Client\Response $response */
+    $result = $response->json();
+
+    $shippingCost = 0;
+
+    foreach ($result['data'] as $courier) {
+        if (
+            strtolower($courier['code']) === strtolower($data['shipping']) &&
+            strtolower($courier['service']) === strtolower($data['shipping_type'])
+        ) {
+            $shippingCost = $courier['cost'];
+        }
+    }
+
+    return [
+        'shipping_cost' => round($shippingCost),
+        'tax' => round($subtotal * 0.11),
+        'grand_total' => round($subtotal * 1.11 + $shippingCost),
+    ];
+}
 }
