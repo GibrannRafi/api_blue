@@ -66,9 +66,22 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+
+    public function showByCode(string $code)
     {
-        //
+          try {
+            $transaction = $this->transactionRepository->getByCode(
+                $code,
+            );
+
+            if (!$transaction){
+                 return ResponseHelper::jsonResponse(false, 'Data  Code Transaksi tidak ditemukan', null, 404);
+            }
+
+            return ResponseHelper::jsonResponse(true, 'Data Code Transaksi berhasil diambil', new TransactionResource($transaction), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 
     /**
