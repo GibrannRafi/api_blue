@@ -12,7 +12,7 @@ class TransactionController extends Controller
 {
     private TransactionRepositoryInterface $transactionRepository;
 
-    public function _construct(TransactionRepositoryInterface $transactionRepository)
+    public function __construct(TransactionRepositoryInterface $transactionRepository)
     {
        $this->transactionRepository = $transactionRepository;
     }

@@ -4,19 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\UUID;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class TransactionDetail extends Model
 {
-    use UUID;
+    use UUID, HasFactory;
 
     protected $fillable = [
         'transaction_id',
         'product_id',
         'qty',
-        'total',
+        'subtotal',
     ];
 
     protected $cast = [
-        'total' => 'decimal:2',
+        'subtotal' => 'decimal:2',
     ];
 
     public function transaction(){
