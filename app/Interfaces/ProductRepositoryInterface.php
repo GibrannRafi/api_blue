@@ -33,5 +33,9 @@ interface ProductRepositoryInterface
         array $data
     );
 
+    public function delete(
+        string $id
+    );
+
 
 }

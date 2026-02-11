@@ -129,7 +129,7 @@ class ProductController extends Controller
 
             $product = $this->productRepository->update($id,$request);
 
-            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diambil', new ProductResource($product), 200);
+            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil diupdate', new ProductResource($product), 200);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
         }
@@ -140,6 +140,20 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $product = $this->productRepository->getById(
+                $id,
+            );
+
+            if (!$product) {
+                return ResponseHelper::jsonResponse(false, 'Data kategori produk tidak ditemukan', null, 404);
+            }
+
+            $product = $this->productRepository->delete($id);
+
+            return ResponseHelper::jsonResponse(true, 'Data kategori produk berhasil dihapus', new ProductResource($product), 200);
+        } catch (\Exception $e) {
+            return ResponseHelper::jsonResponse(false,   $e->getMessage(), null, 500);
+        }
     }
 }
