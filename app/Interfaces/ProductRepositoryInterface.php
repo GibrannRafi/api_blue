@@ -28,5 +28,10 @@ interface ProductRepositoryInterface
         array $data
     );
 
-    
+    public function update(
+        string $id,
+        array $data
+    );
+
+
 }

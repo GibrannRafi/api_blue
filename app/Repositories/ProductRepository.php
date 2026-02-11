@@ -53,7 +53,7 @@ class ProductRepository implements ProductRepositoryInterface
         return $query->paginate($rowPerPage);
     }
 
-     public function getById(
+    public function getById(
         string $id,
     ) {
         $query = Product::where('id', $id)->with('productImages');
@@ -69,7 +69,7 @@ class ProductRepository implements ProductRepositoryInterface
     }
 
     public function create(
-       array $data
+        array $data
     ) {
         DB::beginTransaction();
 
@@ -78,7 +78,7 @@ class ProductRepository implements ProductRepositoryInterface
             $product->store_id = $data['store_id'];
             $product->product_category_id = $data['product_category_id'];
             $product->name = $data['name'];
-            $product->slug = Str::slug($data['name']) . '-i' . rand(100000, 999999 ) . '.' . rand(10000000, 99999999);
+            $product->slug = Str::slug($data['name']) . '-i' . rand(100000, 999999) . '.' . rand(10000000, 99999999);
             $product->description = $data['description'];
             $product->condition = $data['condition'];
             $product->price = $data['price'];
@@ -88,8 +88,8 @@ class ProductRepository implements ProductRepositoryInterface
 
 
             $productImageRepository = new ProductImageRepository;
-            if (isset($data['product_images'])){
-                foreach($data['product_images'] as $productImage) {
+            if (isset($data['product_images'])) {
+                foreach ($data['product_images'] as $productImage) {
                     $productImageRepository->create([
                         'product_id' => $product->id,
                         'image' => $productImage['image'],
@@ -99,12 +99,60 @@ class ProductRepository implements ProductRepositoryInterface
             }
             DB::commit();
             return $product;
-            } catch (\Exception $e) {
-                DB::rollBack();
+        } catch (\Exception $e) {
+            DB::rollBack();
 
-                throw new Exception($e->getMessage());
+            throw new Exception($e->getMessage());
             //throw $th;
         }
     }
 
+    public function update(
+        string $id,
+        array $data
+    ) {
+        DB::beginTransaction();
+
+        try {
+            $product = Product::find($id);
+            $product->store_id = $data['store_id'];
+            $product->product_category_id = $data['product_category_id'];
+            $product->name = $data['name'];
+            $product->slug = Str::slug($data['name']) . '-i' . rand(100000, 999999) . '.' . rand(10000000, 99999999);
+            $product->description = $data['description'];
+            $product->condition = $data['condition'];
+            $product->price = $data['price'];
+            $product->weight = $data['weight'];
+            $product->stock = $data['stock'];
+            $product->save();
+
+
+            $productImageRepository = new ProductImageRepository;
+
+            if (isset($data['deleted_product_images'])) {
+                foreach ($data['deleted_product_images'] as $productImage) {
+                    $productImageRepository->delete($productImage);
+                }
+            }
+
+            if (isset($data['product_images'])) {
+                foreach ($data['product_images'] as $productImage) {
+                    if (!isset($productImage['id'])) {
+                        $productImageRepository->create([
+                            'product_id' => $product->id,
+                            'image' => $productImage['image'],
+                            'is_thumbnail' => $productImage['is_thumbnail']
+                        ]);
+                    }
+                }
+            }
+            DB::commit();
+            return $product;
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            throw new Exception($e->getMessage());
+            //throw $th;
+        }
+    }
 }
